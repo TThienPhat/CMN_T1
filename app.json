@@ -1,0 +1,53 @@
+{
+  "expo": {
+    "name": "ChatApp",
+    "slug": "chat-app",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "plugins": [
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Cho phép ứng dụng truy cập ảnh của bạn để cập nhật ảnh đại diện",
+          "cameraPermission": "Cho phép ứng dụng truy cập camera để chụp ảnh đại diện mới"
+        }
+      ]
+    ],
+    "ios": {
+      "supportsTablet": true,
+      "infoPlist": {
+        "NSPhotoLibraryUsageDescription": "Cho phép ứng dụng truy cập ảnh của bạn để cập nhật ảnh đại diện",
+        "NSCameraUsageDescription": "Cho phép ứng dụng truy cập camera để chụp ảnh đại diện mới"
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#007AFF"
+      },
+      "permissions": [
+        "android.permission.READ_EXTERNAL_STORAGE",
+        "android.permission.WRITE_EXTERNAL_STORAGE",
+        "android.permission.CAMERA"
+      ]
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "screenNames": {
+        "Screen01": "Đăng nhập",
+        "Screen02": "Đăng ký",
+        "Screen03": "Quên mật khẩu",
+        "Screen04": "Hồ sơ cá nhân"
+      }
+    }
+  }
+}

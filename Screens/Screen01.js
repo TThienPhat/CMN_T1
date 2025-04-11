@@ -42,6 +42,14 @@ const Screen01 = ({ navigation }) => {
         placeholderTextColor="#999"
       />
 
+      {/* Thêm nút "Quên mật khẩu" ở đây */}
+      <TouchableOpacity 
+        style={styles.forgotPasswordButton} 
+        onPress={() => navigation.navigate('Screen03')}
+      >
+        <Text style={styles.forgotPasswordText}>Quên mật khẩu?</Text>
+      </TouchableOpacity>
+
       <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
         <Text style={styles.buttonText}>Đăng nhập</Text>
       </TouchableOpacity>
@@ -77,6 +85,14 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
     marginBottom: 15,
     fontSize: 16,
+  },
+  forgotPasswordButton: {
+    alignItems: 'flex-end',
+    marginBottom: 10,
+  },
+  forgotPasswordText: {
+    color: '#007AFF',
+    fontSize: 14,
   },
   loginButton: {
     backgroundColor: '#007AFF',

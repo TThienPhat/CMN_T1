@@ -1,151 +1,203 @@
-import React from 'react';
-import { View, Image, StyleSheet, Dimensions, Text, TouchableOpacity } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
+import React, { useState, useContext } from 'react';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, KeyboardAvoidingView, Platform } from 'react-native';
+import { AuthContext } from '../AuthContext';
 
-const { width, height } = Dimensions.get('window');
+const Screen03 = ({ navigation }) => {
+  const { users, updateUser } = useContext(AuthContext);
+  const [phone, setPhone] = useState('');
+  const [verificationCode, setVerificationCode] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [step, setStep] = useState(1); // 1: Nhập SĐT, 2: Nhập mã và mật khẩu mới
+  const [isLoading, setIsLoading] = useState(false);
 
-const Screen03 = () => {
-  const navigation = useNavigation();
+  // Mô phỏng gửi mã xác minh (trong thực tế cần kết nối API)
+  const handleSendCode = () => {
+    if (!phone) {
+      Alert.alert('Lỗi', 'Vui lòng nhập số điện thoại');
+      return;
+    }
 
-  const handlePressImage87 = () => {
-    navigation.navigate('Screen04');
+    // Kiểm tra số điện thoại có tồn tại không
+    const userExists = users.some(user => user.phone === phone);
+    if (!userExists) {
+      Alert.alert('Lỗi', 'Số điện thoại chưa được đăng ký');
+      return;
+    }
+
+    setIsLoading(true);
+    // Giả lập gửi mã (trong thực tế gọi API ở đây)
+    setTimeout(() => {
+      setIsLoading(false);
+      Alert.alert('Thành công', 'Mã xác minh đã được gửi (Mã demo: 123456)');
+      setStep(2);
+    }, 1500);
   };
 
-  const handlePressA34 = () => {
-    navigation.navigate('Screen02');
+  const handleResetPassword = async () => {
+    if (!verificationCode || !newPassword || !confirmPassword) {
+      Alert.alert('Lỗi', 'Vui lòng nhập đầy đủ thông tin');
+      return;
+    }
+
+    if (newPassword !== confirmPassword) {
+      Alert.alert('Lỗi', 'Mật khẩu không khớp');
+      return;
+    }
+
+    if (newPassword.length < 6) {
+      Alert.alert('Lỗi', 'Mật khẩu phải có ít nhất 6 ký tự');
+      return;
+    }
+
+    // Kiểm tra mã xác minh (trong demo luôn đúng)
+    if (verificationCode !== '123456') {
+      Alert.alert('Lỗi', 'Mã xác minh không đúng');
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+      // Cập nhật mật khẩu mới
+      await updateUser(
+        { phone },
+        { password: newPassword }
+      );
+      
+      Alert.alert('Thành công', 'Đặt lại mật khẩu thành công!', [
+        { text: 'OK', onPress: () => navigation.navigate('Screen01') }
+      ]);
+    } catch (error) {
+      Alert.alert('Lỗi', error.message || 'Có lỗi xảy ra');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
-    <View style={styles.container}>
-      <View style={styles.topRow}>
-        <TouchableOpacity onPress={handlePressA34}>
-          <Image source={require('../assets/image/ArtistProfile/a34.png')} style={styles.topImage} />
-        </TouchableOpacity>
-        <Image source={require('../assets/image/ArtistProfile/a35.png')} style={styles.topImage} />
-      </View>
-      <Image source={require('../assets/image/ArtistProfile/a31.png')} style={styles.fullWidthImage} />
-      <Image source={require('../assets/image/ArtistProfile/a32.png')} style={styles.fullWidthImage} />
-      <View style={styles.imageContainer}>
-        <View style={styles.imageRow}>
-          <TouchableOpacity onPress={handlePressImage87}>
-            <Image source={require('../assets/image/AudioListing-SearchResults/Image87.png')} style={styles.image} />
+    <KeyboardAvoidingView
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      style={styles.container}
+    >
+      {/* Header với nút quay lại */}
+      <TouchableOpacity 
+        onPress={() => step === 1 ? navigation.goBack() : setStep(1)}
+        style={styles.backButton}
+      >
+        <Text style={styles.backText}>← Quay lại</Text>
+      </TouchableOpacity>
+
+      <Text style={styles.title}>Quên mật khẩu</Text>
+
+      {step === 1 ? (
+        // Bước 1: Nhập số điện thoại
+        <>
+          <TextInput
+            style={styles.input}
+            placeholder="Số điện thoại đã đăng ký"
+            value={phone}
+            onChangeText={setPhone}
+            keyboardType="phone-pad"
+            autoFocus
+          />
+
+          <TouchableOpacity
+            style={[styles.button, isLoading && styles.disabledButton]}
+            onPress={handleSendCode}
+            disabled={isLoading}
+          >
+            <Text style={styles.buttonText}>
+              {isLoading ? 'Đang gửi...' : 'Gửi mã xác minh'}
+            </Text>
           </TouchableOpacity>
-          <View style={styles.infoContainer}>
-            <Text style={styles.infoText}>FLOWER</Text>
-            <Text style={styles.infoText}>Jessica Gonzalez</Text>
-            <Text style={styles.infoText}>2,1M     •3:36</Text>
-          </View>
-        </View>
-        <View style={styles.imageRow}>
-          <Image source={require('../assets/image/AudioListing-SearchResults/Image84.png')} style={styles.image} />
-          <View style={styles.infoContainer}>
-            <Text style={styles.infoText}>SHAPE OF YOU</Text>
-            <Text style={styles.infoText}>Anthony Taylor</Text>
-            <Text style={styles.infoText}>68M     •3:35</Text>
-          </View>
-        </View>
-        <View style={styles.imageRow}>
-          <Image source={require('../assets/image/AudioListing-SearchResults/Image86.png')} style={styles.image} />
-          <View style={styles.infoContainer}>
-            <Text style={styles.infoText}>BLINDING LIGHTS</Text>
-            <Text style={styles.infoText}>Brian Bailey</Text>
-            <Text style={styles.infoText}>93M     •4:39</Text>
-          </View>
-        </View>
-        <View style={styles.imageRow}>
-          <Image source={require('../assets/image/AudioListing-SearchResults/Image87.png')} style={styles.image} />
-          <View style={styles.infoContainer}>
-            <Text style={styles.infoText}>FLOWER</Text>
-            <Text style={styles.infoText}>Jessica Gonzalez</Text>
-            <Text style={styles.infoText}>2,1M     •3:36</Text>
-          </View>
-        </View>
-        <View style={styles.imageRow}>
-          <Image source={require('../assets/image/ArtistProfile/Image69.png')} style={styles.image} />
-          <View style={styles.infoContainer}>
-            <Text style={styles.infoText}>levitating</Text>
-            <Text style={styles.infoText}>Anthony Taylor</Text>
-            <Text style={styles.infoText}>9M     •7:48</Text>
-          </View>
-        </View>
-        <View style={styles.imageRow}>
-          <Image source={require('../assets/image/ArtistProfile/Image70.png')} style={styles.image} />
-          <View style={styles.infoContainer}>
-            <Text style={styles.infoText}>Astronaut in the Ocean</Text>
-            <Text style={styles.infoText}>Pedro Moreno</Text>
-            <Text style={styles.infoText}>23M     •3:36</Text>
-          </View>
-        </View>
-      </View>
-      <Image source={require('../assets/image/ArtistProfile/a33.png')} style={styles.fullWidthImage} />
-      <View style={styles.taskbar}>
-        <Image source={require('../assets/image/ArtistProfile/TabBarMenu5.png')} style={styles.taskbarImage} />
-      </View>
-    </View>
+        </>
+      ) : (
+        // Bước 2: Nhập mã và mật khẩu mới
+        <>
+          <TextInput
+            style={styles.input}
+            placeholder="Mã xác minh (Nhập 123456)"
+            value={verificationCode}
+            onChangeText={setVerificationCode}
+            keyboardType="number-pad"
+          />
+
+          <TextInput
+            style={styles.input}
+            placeholder="Mật khẩu mới"
+            value={newPassword}
+            onChangeText={setNewPassword}
+            secureTextEntry
+          />
+
+          <TextInput
+            style={styles.input}
+            placeholder="Nhập lại mật khẩu mới"
+            value={confirmPassword}
+            onChangeText={setConfirmPassword}
+            secureTextEntry
+          />
+
+          <TouchableOpacity
+            style={[styles.button, isLoading && styles.disabledButton]}
+            onPress={handleResetPassword}
+            disabled={isLoading}
+          >
+            <Text style={styles.buttonText}>
+              {isLoading ? 'Đang xử lý...' : 'Đặt lại mật khẩu'}
+            </Text>
+          </TouchableOpacity>
+        </>
+      )}
+    </KeyboardAvoidingView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    padding: 20,
     backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
   },
-  topRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    width: '100%',
-    padding: 5,
+  backButton: {
+    marginTop: 15,
+    marginBottom: 20,
   },
-  topImage: {
-    width: width * 0.1,
-    height: width * 0.1,
-    resizeMode: 'contain',
+  backText: {
+    color: '#007AFF',
+    fontSize: 16,
   },
-  fullWidthImage: {
-    width: '100%',
-    height: width * 0.2,
-    resizeMode: 'contain',
-    marginVertical: 5,
-  },
-  imageContainer: {
-    flex: 1,
-    justifyContent: 'flex-start',
-    alignItems: 'flex-start',
-    width: '100%',
-    paddingLeft: 10,
-  },
-  imageRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginVertical: 5,
-  },
-  image: {
-    width: width * 0.15,
-    height: width * 0.15,
-    resizeMode: 'contain',
-  },
-  infoContainer: {
-    marginLeft: 10,
-  },
-  infoText: {
-    fontSize: 10,
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 30,
+    textAlign: 'center',
     color: '#333',
   },
-  taskbar: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
+  input: {
     height: 50,
-    alignItems: 'center',
-    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 8,
+    paddingHorizontal: 15,
+    marginBottom: 15,
+    fontSize: 16,
+    backgroundColor: '#f9f9f9',
   },
-  taskbarImage: {
-    width: '100%',
-    height: '100%',
-    resizeMode: 'contain',
+  button: {
+    backgroundColor: '#007AFF',
+    padding: 15,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginTop: 10,
+  },
+  disabledButton: {
+    backgroundColor: '#99c2ff',
+  },
+  buttonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '600',
   },
 });
 
